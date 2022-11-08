@@ -103,7 +103,7 @@ async def _add_user_to_queue(message, rs_level: int):
             return
 
     #User not in queue, just add it
-    current_queue.append(users.QueuedUser(user_name=message.author.name, id=message.author.id, timeout=constants.TIMEOUT))
+    current_queue.append(users.QueuedUser(user_name=message.author.name, id=message.author.id, timeout=constants.TIMEOUT,  queue_time=time.time()))
     __QUEUES[rs_level] = current_queue
 
     if len(current_queue) < 3:
