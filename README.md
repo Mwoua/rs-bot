@@ -9,6 +9,7 @@ Note: its currently coded so it works on only one server. If the bot is running 
 - clearX: empty the queue for red star level X
 - rsX: queue user for red star level X queue
 - out: remove user from all queues
+- timeout X: change all your queues timeout, with X a time in hour
 
 ## Setup
 

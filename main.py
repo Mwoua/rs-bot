@@ -69,13 +69,20 @@ async def out(ctx):
 
 
 @bot.command()
+async def timeout(ctx, timeout: float):
+    '''timeout command'''
+    await queuemanagement.update_user_timeout(ctx, timeout)
+
+
+@bot.command()
 async def help(ctx):
     '''help command'''
     message = 'Red star bot commands:\n'
     message += 'help: display this message\n'
     message += 'clearx: empty the queue for red star level x\n'
     message += 'rsx: queue user for red star level x queue\n'
-    message += 'out: remove user from all queues'
+    message += 'out: remove user from all queues\n'
+    message += 'timeout X: change all your queues timeout, with X a time in hour\n'
     await ctx.message.channel.send(message)
 
 @bot.event

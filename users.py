@@ -9,4 +9,5 @@ class QueuedUser:
     """
     user_name: str
     id: int
+    timeout: float
     queue_time: float = time.time()

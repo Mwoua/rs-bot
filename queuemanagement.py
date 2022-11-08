@@ -17,7 +17,7 @@ async def check_timeout():
         current_queue = __QUEUES.get(rs_level, [])
 
         for user in current_queue[:]:
-            if now >= user.queue_time + constants.TIMEOUT:
+            if now >= user.queue_time + user.timeout:
                 current_queue.remove(user)
 
         __QUEUES[rs_level] = current_queue
@@ -64,6 +64,22 @@ async def remove_user(ctx):
                 )
     return
 
+async def update_user_timeout(ctx, timeout: float):
+    '''Update timeout for user in all queues'''
+    anything_updated = False
+    for rs_level in range(1, constants.MAX_RS):
+        global __QUEUES
+        current_queue = __QUEUES.get(rs_level, [])
+        for user in current_queue:
+            if user.id == ctx.message.author.id:
+                user.timeout = timeout*60*60
+                anything_updated = True
+                __QUEUES[rs_level] = current_queue
+
+    if anything_updated:
+        await ctx.message.channel.send(f"Timeout updated to {timeout} hours in all queues")
+    else:
+        await ctx.message.channel.send("You are not in a queue")
 
 QueueFunctions = {
     f'{constants.PREFIX}rs': parse_RS,
@@ -79,14 +95,15 @@ async def _add_user_to_queue(message, rs_level: int):
     #Check if the user is in the queue
     for i in range(len(current_queue)):
         if current_queue[i].id == message.author.id:
-            current_queue[i].QueueTime = time.time()
+            current_queue[i].queue_time = time.time()
+            current_queue[i].timeout = constants.TIMEOUT
             await message.channel.send(f"Timer refreshed for RS{rs_level} for {message.author.name}")
             __QUEUES[rs_level] = current_queue
             await _CheckQueue(message, rs_level)
             return
 
     #User not in queue, just add it
-    current_queue.append(users.QueuedUser(user_name=message.author.name, id=message.author.id))
+    current_queue.append(users.QueuedUser(user_name=message.author.name, id=message.author.id, timeout=constants.TIMEOUT))
     __QUEUES[rs_level] = current_queue
 
     if len(current_queue) < 3:
