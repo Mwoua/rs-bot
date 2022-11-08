@@ -143,7 +143,7 @@ async def _CheckQueue(message, RS_level):
     now = time.time()
     for user in current_queue:
         last_activity = int((now - user.queue_time) / 60)
-        message_to_send += f" {str(user.user_name)} ({last_activity} minutes)"
+        message_to_send += f" **{str(user.user_name)}** (*{last_activity} minutes*)"
     if len(message_to_send) == 0:
         message_to_send = "No user"
     await message.channel.send(message_to_send + ' in queue')
