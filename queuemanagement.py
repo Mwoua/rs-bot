@@ -81,6 +81,7 @@ async def _add_user_to_queue(message, rs_level: int):
         if current_queue[i].id == message.author.id:
             current_queue[i].QueueTime = time.time()
             await message.channel.send(f"Timer refreshed for RS{rs_level} for {message.author.name}")
+            __QUEUES[rs_level] = current_queue
             await _CheckQueue(message, rs_level)
             return
 
@@ -90,9 +91,7 @@ async def _add_user_to_queue(message, rs_level: int):
 
     if len(current_queue) < 3:
         message_to_send = f'{message.author.name} added to RS{rs_level} queue. Users in queue: '
-        for user in current_queue:
-            message_to_send += message.author.name + " "
-        await message.channel.send(message_to_send)
+        await _CheckQueue(message, rs_level)
     elif len(current_queue) == 3:
         await message.channel.send(f'<@&{roles_id[rs_level]}> 3/4 for RS{rs_level} queue')
     elif len(current_queue) == 4:
