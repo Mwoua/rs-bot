@@ -11,8 +11,9 @@ RS_role = "RS"
 __QUEUES = {} # Dict of [RS_level][List of QueuedUser in the queue]
 roles_id = {RS_more_role:{}, RS_role:{}} # Dict of dict of roles id
 valid_channels_id = [] # List of monitored channels
+rs_channels = {} # all rs channels
 
-async def check_timeout():
+async def check_timeout(bot):
     '''Check if any user queue has timed out'''
     now = time.time()
     for rs_level in range(1, constants.MAX_RS):
@@ -21,6 +22,8 @@ async def check_timeout():
 
         for user in current_queue[:]:
             if now >= user.queue_time + user.timeout:
+                channel = bot.get_channel(rs_channels[rs_level])
+                await channel.send(f'{user.user_name} removed from queue')
                 current_queue.remove(user)
 
         __QUEUES[rs_level] = current_queue

@@ -33,7 +33,7 @@ async def on_ready():
 
     roles = guild.roles
     for role in roles:
-        match_result_more = re.match("RS(\d+)\s+-\s+Need", role.name)
+        match_result_more = re.match("^RS(\d+)\s+-\s+Need", role.name)
         if (match_result_more) and int(match_result_more.group(1)) > 0 and int(match_result_more.group(1)) < constants.MAX_RS:
             queuemanagement.roles_id[queuemanagement.RS_more_role][int(match_result_more.group(1))] = role.id
 
@@ -42,8 +42,12 @@ async def on_ready():
             queuemanagement.roles_id[queuemanagement.RS_role][int(match_result_RS.group(1))] = role.id
 
     for channel in guild.channels:
-        if channel.name.startswith('bot') or re.match("rs\d+", channel.name):
+        match_rs_chan = re.match("^rs(\d+)$", channel.name)
+        if channel.name.startswith('bot') or match_rs_chan:
             queuemanagement.valid_channels_id.append(channel.id)
+
+        if match_rs_chan:
+            queuemanagement.rs_channels[int(match_rs_chan.group(1))] = channel.id
 
     sys.stderr.write('Bot started on server: ' + guild.name + '\n')
     task_loop.start()
@@ -97,7 +101,7 @@ async def on_command_error(ctx, command):
 @tasks.loop(seconds=300)
 async def task_loop():
     '''loop to check user timeout'''
-    await queuemanagement.check_timeout()
+    await queuemanagement.check_timeout(bot)
 
 
 bot.run(os.getenv('TOKEN'))
