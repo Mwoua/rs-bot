@@ -51,7 +51,7 @@ async def parse_check(message):
     '''Parse check command message and call the corresponding function'''
     RS_level = _ParseRSLevel(message.content)
     if RS_level > 0 and RS_level <= constants.MAX_RS:
-        await _CheckQueue(message, RS_level)
+        await _CheckQueue(message, RS_level, False)
     else:
         return
 
@@ -141,7 +141,7 @@ def _ParseRSLevel(content: str):
     return 0
 
 
-async def _CheckQueue(message, RS_level):
+async def _CheckQueue(message, RS_level: int, ping: bool = True):
     global __QUEUES
     current_queue = __QUEUES.get(RS_level, [])
     message_to_send = ""
@@ -154,4 +154,5 @@ async def _CheckQueue(message, RS_level):
     if len(message_to_send) == 0:
         message_to_send = "No user"
     await message.channel.send(message_to_send + ' in queue')
-    await message.channel.send(f'<@&{roles_id[RS_role][RS_level]}> - {count}/4')
+    if ping:
+        await message.channel.send(f'<@&{roles_id[RS_role][RS_level]}> - {count}/4')
