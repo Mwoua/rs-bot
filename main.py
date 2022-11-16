@@ -33,9 +33,13 @@ async def on_ready():
 
     roles = guild.roles
     for role in roles:
-        match_result = re.match("RS(\d+)\s+-\s+Need", role.name)
-        if (match_result) and int(match_result.group(1)) > 0 and int(match_result.group(1)) < constants.MAX_RS:
-            queuemanagement.roles_id[int(match_result.group(1))] = role.id
+        match_result_more = re.match("RS(\d+)\s+-\s+Need", role.name)
+        if (match_result_more) and int(match_result_more.group(1)) > 0 and int(match_result_more.group(1)) < constants.MAX_RS:
+            queuemanagement.roles_id[queuemanagement.RS_more_role][int(match_result_more.group(1))] = role.id
+
+        match_result_RS = re.match("^RS(\d+)$", role.name)
+        if (match_result_RS) and int(match_result_RS.group(1)) > 0 and int(match_result_RS.group(1)) < constants.MAX_RS:
+            queuemanagement.roles_id[queuemanagement.RS_role][int(match_result_RS.group(1))] = role.id
 
     for channel in guild.channels:
         if channel.name.startswith('bot') or re.match("rs\d+", channel.name):

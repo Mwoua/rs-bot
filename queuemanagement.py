@@ -5,8 +5,11 @@ import time
 import users
 import constants
 
+RS_more_role = "RS_more"
+RS_role = "RS"
+
 __QUEUES = {} # Dict of [RS_level][List of QueuedUser in the queue]
-roles_id = {} # Dict of roles for Need 1 more
+roles_id = {RS_more_role:{}, RS_role:{}} # Dict of dict of roles id
 valid_channels_id = [] # List of monitored channels
 
 async def check_timeout():
@@ -107,10 +110,9 @@ async def _add_user_to_queue(message, rs_level: int):
     __QUEUES[rs_level] = current_queue
 
     if len(current_queue) < 3:
-        message_to_send = f'{message.author.name} added to RS{rs_level} queue. Users in queue: '
         await _CheckQueue(message, rs_level)
     elif len(current_queue) == 3:
-        await message.channel.send(f'<@&{roles_id[rs_level]}> 3/4 for RS{rs_level} queue')
+        await message.channel.send(f'<@&{roles_id[RS_more_role][rs_level]}> 3/4 for RS{rs_level} queue')
     elif len(current_queue) == 4:
         message_to_send = f'Full team found for RS{rs_level} :'
         for user in current_queue:
@@ -141,9 +143,12 @@ async def _CheckQueue(message, RS_level):
     current_queue = __QUEUES.get(RS_level, [])
     message_to_send = ""
     now = time.time()
+    count = 0
     for user in current_queue:
         last_activity = int((now - user.queue_time) / 60)
         message_to_send += f" **{str(user.user_name)}** (*{last_activity} minutes*)"
+        count += 1
     if len(message_to_send) == 0:
         message_to_send = "No user"
     await message.channel.send(message_to_send + ' in queue')
+    await message.channel.send(f'<@&{roles_id[RS_role][RS_level]}> - {count}/4')
